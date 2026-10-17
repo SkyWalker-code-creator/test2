@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SkyWalker | Anti-Cheat Architect</title>
+  <link rel="icon" href="avatar.png">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/motion.css">
+</head>
+<body>
+
+  <canvas id="bgCanvas"></canvas>
+
+  <div class="boot-screen" id="bootScreen">
+    <div class="boot-logo">◈</div>
+    <div class="boot-text" id="bootText">INITIALIZING NARRATIVE...</div>
+  </div>
+
+  <div class="toast-container" id="toastContainer"></div>
+
+  <div class="overlay" id="paletteOverlay">
+    <div class="modal">
+      <input type="text" class="modal-input" id="paletteInput" placeholder="Search commands...">
+      <div class="modal-list" id="paletteList"></div>
+      <div class="modal-footer"><kbd>↑↓</kbd> Navigate <kbd>↵</kbd> Select <kbd>Esc</kbd> Close</div>
+    </div>
+  </div>
+
+  <div class="overlay" id="searchOverlay">
+    <div class="modal">
+      <input type="text" class="modal-input" id="searchInput" placeholder="Fuzzy search across all files...">
+      <div class="modal-list" id="searchList"></div>
+    </div>
+  </div>
+
+  <div class="window" id="appWindow">
+    <div class="titlebar">
+      <div class="dots">
+        <div class="dot red" onclick="App.notify('System secured.', 'error')"></div>
+        <div class="dot yellow"></div>
+        <div class="dot green"></div>
+      </div>
+      <div class="titlebar-center">
+        <span style="opacity:0.5">◈</span> <span id="tbTitle">SkyWalker.cs</span> <span style="opacity:0.3">— VS Code</span>
+      </div>
+      <div class="titlebar-actions">
+        <button class="tb-btn" id="btnMusic">🎵 Music</button>
+        <button class="tb-btn" onclick="App.openPalette()">⌘ Ctrl+K</button>
+      </div>
+    </div>
+
+    <div class="tabbar" id="tabbar">
+      <div class="tab active" data-tab="bio">◈ Bio.cs</div>
+      <div class="tab" data-tab="project">◈ RustShield.md</div>
+      <div class="tab" data-tab="skills">◈ Skills.json</div>
+      <div class="tab" data-tab="timeline">◈ Timeline.txt</div>
+      <div class="tab" data-tab="setup">◈ Setup.md</div>
+      <div class="tab" data-tab="contacts">◈ Contacts.txt</div>
+    </div>
+
+    <div class="body-layout">
+      <!-- ОГРОМНЫЙ EXPLORER -->
+      <aside class="sidebar">
+        <div class="sb-header">
+          <div class="sb-title">EXPLORER</div>
+          <div class="sb-actions">
+            <span title="New File">📄</span>
+            <span title="New Folder">📁</span>
+            <span title="Refresh">🔄</span>
+            <span title="Collapse">❯</span>
+          </div>
+        </div>
+        
+        <div class="sb-tree">
+          <div class="sb-folder open"><span class="arrow">▼</span> 📁 RUST_SHIELD_PROJECT</div>
+          
+          <div class="sb-folder open" style="padding-left: 24px;"><span class="arrow">▼</span> 📁 src</div>
+          <div class="sb-folder open" style="padding-left: 36px;"><span class="arrow">▼</span> 📁 Core</div>
+          <div class="sb-item" data-nav="project" style="padding-left: 52px;"><span class="icon cyan">C#</span> ScannerEngine.cs</div>
+          <div class="sb-item" data-nav="project" style="padding-left: 52px;"><span class="icon cyan">C#</span> MemoryReader.cs</div>
+          <div class="sb-item" data-nav="project" style="padding-left: 52px;"><span class="icon cyan">C#</span> SignatureMatcher.cs</div>
+          <div class="sb-item" data-nav="project" style="padding-left: 52px;"><span class="icon cyan">C#</span> ProcessMonitor.cs</div>
+          
+          <div class="sb-folder open" style="padding-left: 36px;"><span class="arrow">▼</span> 📁 UI</div>
+          <div class="sb-item" data-nav="bio" style="padding-left: 52px;"><span class="icon blue">◈</span> MainWindow.xaml</div>
+          <div class="sb-item" data-nav="bio" style="padding-left: 52px;"><span class="icon blue">◈</span> Dashboard.xaml</div>
+          <div class="sb-item" data-nav="bio" style="padding-left: 52px;"><span class="icon blue">◈</span> SettingsView.xaml</div>
+          <div class="sb-item" data-nav="bio" style="padding-left: 52px;"><span class="icon purple">◈</span> AppStyles.xaml</div>
+          
+          <div class="sb-folder open" style="padding-left: 36px;"><span class="arrow">▼</span> 📁 Utils</div>
+          <div class="sb-item" data-nav="project" style="padding-left: 52px;"><span class="icon cyan">C#</span> NativeMethods.cs</div>
+          <div class="sb-item" data-nav="project" style="padding-left: 52px;"><span class="icon cyan">C#</span> HashHelper.cs</div>
+          <div class="sb-item" data-nav="project" style="padding-left: 52px;"><span class="icon cyan">C#</span> Logger.cs</div>
+
+          <div class="sb-folder" style="padding-left: 24px;"><span class="arrow">▶</span> 📁 Signatures (locked)</div>
+          <div class="sb-folder" style="padding-left: 24px;"><span class="arrow">▶</span> 📁 Drivers (locked)</div>
+          <div class="sb-folder" style="padding-left: 24px;"><span class="arrow">▶</span> 📁 Tests</div>
+
+          <div class="sb-folder open" style="margin-top: 10px;"><span class="arrow">▼</span> 📁 DOCS</div>
+          <div class="sb-item" data-nav="bio" style="padding-left: 34px;"><span class="icon md">MD</span> README.md</div>
+          <div class="sb-item" data-nav="project" style="padding-left: 34px;"><span class="icon md">MD</span> Architecture.md</div>
+          <div class="sb-item" data-nav="timeline" style="padding-left: 34px;"><span class="icon txt">TXT</span> Timeline.txt</div>
+          <div class="sb-item" data-nav="setup" style="padding-left: 34px;"><span class="icon md">MD</span> Installation.md</div>
+          <div class="sb-item" data-nav="contacts" style="padding-left: 34px;"><span class="icon txt">TXT</span> Contacts.txt</div>
+
+          <div class="sb-folder open" style="margin-top: 10px;"><span class="arrow">▼</span> 📁 CONFIG</div>
+          <div class="sb-item" data-nav="skills" style="padding-left: 34px;"><span class="icon json">{ }</span> skills.json</div>
+          <div class="sb-item" data-nav="skills" style="padding-left: 34px;"><span class="icon json">{ }</span> appsettings.json</div>
+          <div class="sb-item" style="padding-left: 34px;"><span class="icon json">{ }</span> signature_db.json</div>
+          
+          <div class="sb-folder open" style="margin-top: 10px;"><span class="arrow">▼</span> 📁 ROOT</div>
+          <div class="sb-item" style="padding-left: 34px;"><span class="icon xml">📄</span> RustShield.csproj</div>
+          <div class="sb-item" style="padding-left: 34px;"><span class="icon xml">📄</span> .gitignore</div>
+          <div class="sb-item" style="padding-left: 34px;"><span class="icon xml">📄</span> LICENSE</div>
+          <div class="sb-item" style="padding-left: 34px;"><span class="icon xml">📄</span> icon.ico</div>
+        </div>
+
+        <div class="sb-footer">
+          <button class="sb-btn" onclick="App.openSearch()">🔍 Search Files</button>
+          <button class="sb-btn" onclick="App.toggleTerm()">⌨ Toggle Terminal</button>
+        </div>
+      </aside>
+
+      <div class="main-area">
+        <main class="main" id="mainContent" style="view-transition-name: main-view;"></main>
+        
+        <div class="terminal closed" id="terminal">
+          <div class="term-head">
+            <span>TERMINAL</span>
+            <span style="cursor:pointer;" onclick="App.toggleTerm()">×</span>
+          </div>
+          <div class="term-body" id="termBody">
+            <div class="term-line"><span class="term-prompt">skywalker@dev:~$</span><span>Type 'help' to begin.</span></div>
+            <div class="term-line" style="margin-top:8px;">
+              <span class="term-prompt">skywalker@dev:~$</span>
+              <input type="text" class="term-in" id="termInput" autocomplete="off" spellcheck="false">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="bottom-bar">
+      <div class="bb-item" onclick="App.toggleTerm()"><span class="icon">⌄</span> Terminal</div>
+      <div class="bb-item" onclick="App.openPalette()"><span class="icon">⌘</span> Palette</div>
+      <div class="bb-item" onclick="document.body.classList.toggle('zen-mode')"><span class="icon">◐</span> Zen</div>
+      <div style="flex:1"></div>
+      <div class="bb-item" id="clock">00:00:00</div>
+    </div>
+  </div>
+
+  <script src="js/data.js"></script>
+  <script src="js/audio.js"></script>
+  <script src="js/views.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
