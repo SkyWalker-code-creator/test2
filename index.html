@@ -8,10 +8,22 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/main.css">
   <link rel="stylesheet" href="css/motion.css">
+  <link rel="stylesheet" href="css/themes.css">
+  
+  <style>
+    #themeOverlay { padding-top: 15vh !important; align-items: flex-start !important; }
+    #themeOverlay .modal { max-width: 360px !important; height: auto !important; min-height: auto !important; background: rgba(25, 25, 30, 0.98) !important; }
+    #themeOverlay .modal-list { max-height: 250px !important; }
+    .modal-item.selected { background: rgba(86, 156, 214, 0.3) !important; }
+  </style>
 </head>
 <body>
 
   <canvas id="bgCanvas"></canvas>
+  <canvas id="matrixCanvas" style="position:fixed;inset:0;z-index:1;pointer-events:none;display:none;"></canvas>
+
+  <audio id="bgMusic" src="music.mp3" loop preload="auto"></audio>
+  <audio id="webMusic" preload="none"></audio>
 
   <div class="boot-screen" id="bootScreen">
     <div class="boot-logo">◈</div>
@@ -35,6 +47,29 @@
     </div>
   </div>
 
+  <div class="overlay" id="themeOverlay">
+    <div class="modal">
+      <div class="modal-input" style="cursor:default;">🎨 Выберите тему</div>
+      <div class="modal-list" id="themeList"></div>
+    </div>
+  </div>
+
+  <!-- Окно для чтения статьи в блоге -->
+  <div class="overlay" id="blogOverlay">
+    <div class="modal" style="max-width: 700px;">
+      <div style="padding: 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.2);">
+        <div>
+          <div id="blogModalTitle" style="font-size: 20px; font-weight: bold; color: var(--text);"></div>
+          <div id="blogModalDate" style="font-family: var(--font-mono); font-size: 12px; color: var(--text-dim); margin-top: 4px;"></div>
+        </div>
+        <button onclick="App.closeBlog()" style="background: none; border: none; color: var(--text-dim); font-size: 24px; cursor: pointer; transition: 0.2s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='var(--text-dim)'">×</button>
+      </div>
+      <div id="blogModalBody" style="padding: 24px; color: #d1d1d6; font-size: 15px; line-height: 1.8; max-height: 60vh; overflow-y: auto;">
+        <!-- Текст статьи -->
+      </div>
+    </div>
+  </div>
+
   <div class="window" id="appWindow">
     <div class="titlebar">
       <div class="dots">
@@ -43,10 +78,11 @@
         <div class="dot green"></div>
       </div>
       <div class="titlebar-center">
-        <span style="opacity:0.5">◈</span> <span id="tbTitle">SkyWalker.cs</span> <span style="opacity:0.3">— VS Code</span>
+        <span style="opacity:0.5">◈</span> <span id="tbTitle">SkyWalker.cs</span> <span style="opacity:0.3">- VS Code</span>
       </div>
       <div class="titlebar-actions">
         <button class="tb-btn" id="btnMusic">🎵 Music</button>
+        <button class="tb-btn" id="btnTheme">🎨 Theme</button>
         <button class="tb-btn" onclick="App.openPalette()">⌘ Ctrl+K</button>
       </div>
     </div>
@@ -58,10 +94,14 @@
       <div class="tab" data-tab="timeline">◈ Timeline.txt</div>
       <div class="tab" data-tab="setup">◈ Setup.md</div>
       <div class="tab" data-tab="contacts">◈ Contacts.txt</div>
+      <div class="tab" data-tab="gallery">◈ Gallery.md</div>
+      <div class="tab" data-tab="blog">◈ Blog.md</div>
+      <div class="tab" data-tab="stats">◈ Stats.json</div>
+      <div class="tab" data-tab="changelog">◈ Changelog.txt</div>
+      <div class="tab" data-tab="converter">◈ Converter.js</div>
     </div>
 
     <div class="body-layout">
-      <!-- ОГРОМНЫЙ EXPLORER -->
       <aside class="sidebar">
         <div class="sb-header">
           <div class="sb-title">EXPLORER</div>
@@ -72,23 +112,23 @@
             <span title="Collapse">❯</span>
           </div>
         </div>
-        
+
         <div class="sb-tree">
           <div class="sb-folder open"><span class="arrow">▼</span> 📁 RUST_SHIELD_PROJECT</div>
-          
+
           <div class="sb-folder open" style="padding-left: 24px;"><span class="arrow">▼</span> 📁 src</div>
           <div class="sb-folder open" style="padding-left: 36px;"><span class="arrow">▼</span> 📁 Core</div>
           <div class="sb-item" data-nav="project" style="padding-left: 52px;"><span class="icon cyan">C#</span> ScannerEngine.cs</div>
           <div class="sb-item" data-nav="project" style="padding-left: 52px;"><span class="icon cyan">C#</span> MemoryReader.cs</div>
           <div class="sb-item" data-nav="project" style="padding-left: 52px;"><span class="icon cyan">C#</span> SignatureMatcher.cs</div>
           <div class="sb-item" data-nav="project" style="padding-left: 52px;"><span class="icon cyan">C#</span> ProcessMonitor.cs</div>
-          
+
           <div class="sb-folder open" style="padding-left: 36px;"><span class="arrow">▼</span> 📁 UI</div>
           <div class="sb-item" data-nav="bio" style="padding-left: 52px;"><span class="icon blue">◈</span> MainWindow.xaml</div>
           <div class="sb-item" data-nav="bio" style="padding-left: 52px;"><span class="icon blue">◈</span> Dashboard.xaml</div>
-          <div class="sb-item" data-nav="bio" style="padding-left: 52px;"><span class="icon blue">◈</span> SettingsView.xaml</div>
+          <div class="sb-item" data-nav="gallery" style="padding-left: 52px;"><span class="icon blue">◈</span> SettingsView.xaml</div>
           <div class="sb-item" data-nav="bio" style="padding-left: 52px;"><span class="icon purple">◈</span> AppStyles.xaml</div>
-          
+
           <div class="sb-folder open" style="padding-left: 36px;"><span class="arrow">▼</span> 📁 Utils</div>
           <div class="sb-item" data-nav="project" style="padding-left: 52px;"><span class="icon cyan">C#</span> NativeMethods.cs</div>
           <div class="sb-item" data-nav="project" style="padding-left: 52px;"><span class="icon cyan">C#</span> HashHelper.cs</div>
@@ -104,12 +144,18 @@
           <div class="sb-item" data-nav="timeline" style="padding-left: 34px;"><span class="icon txt">TXT</span> Timeline.txt</div>
           <div class="sb-item" data-nav="setup" style="padding-left: 34px;"><span class="icon md">MD</span> Installation.md</div>
           <div class="sb-item" data-nav="contacts" style="padding-left: 34px;"><span class="icon txt">TXT</span> Contacts.txt</div>
+          <div class="sb-item" data-nav="blog" style="padding-left: 34px;"><span class="icon md">MD</span> Blog.md</div>
+          <div class="sb-item" data-nav="changelog" style="padding-left: 34px;"><span class="icon txt">TXT</span> Changelog.txt</div>
 
           <div class="sb-folder open" style="margin-top: 10px;"><span class="arrow">▼</span> 📁 CONFIG</div>
           <div class="sb-item" data-nav="skills" style="padding-left: 34px;"><span class="icon json">{ }</span> skills.json</div>
+          <div class="sb-item" data-nav="stats" style="padding-left: 34px;"><span class="icon json">{ }</span> stats.json</div>
           <div class="sb-item" data-nav="skills" style="padding-left: 34px;"><span class="icon json">{ }</span> appsettings.json</div>
           <div class="sb-item" style="padding-left: 34px;"><span class="icon json">{ }</span> signature_db.json</div>
-          
+
+          <div class="sb-folder open" style="margin-top: 10px;"><span class="arrow">▼</span> 📁 TOOLS</div>
+          <div class="sb-item" data-nav="converter" style="padding-left: 34px;"><span class="icon json">JS</span> Converter.js</div>
+
           <div class="sb-folder open" style="margin-top: 10px;"><span class="arrow">▼</span> 📁 ROOT</div>
           <div class="sb-item" style="padding-left: 34px;"><span class="icon xml">📄</span> RustShield.csproj</div>
           <div class="sb-item" style="padding-left: 34px;"><span class="icon xml">📄</span> .gitignore</div>
@@ -125,7 +171,7 @@
 
       <div class="main-area">
         <main class="main" id="mainContent" style="view-transition-name: main-view;"></main>
-        
+
         <div class="terminal closed" id="terminal">
           <div class="term-head">
             <span>TERMINAL</span>
@@ -145,15 +191,17 @@
     <div class="bottom-bar">
       <div class="bb-item" onclick="App.toggleTerm()"><span class="icon">⌄</span> Terminal</div>
       <div class="bb-item" onclick="App.openPalette()"><span class="icon">⌘</span> Palette</div>
-      <div class="bb-item" onclick="document.body.classList.toggle('zen-mode')"><span class="icon">◐</span> Zen</div>
+      <div class="bb-item" onclick="App.toggleZen()"><span class="icon">◐</span> Zen</div>
+      <div class="bb-item" onclick="App.toggleMatrix()"><span class="icon">▓</span> Matrix</div>
+      <div class="bb-item" onclick="App.openTheme()"><span class="icon">🎨</span> Theme</div>
       <div style="flex:1"></div>
       <div class="bb-item" id="clock">00:00:00</div>
     </div>
   </div>
 
   <script src="js/data.js"></script>
-  <script src="js/audio.js"></script>
   <script src="js/views.js"></script>
+  <script src="js/github.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>
